@@ -13,7 +13,9 @@ from datetime import datetime, timedelta
 import time
 
 # Diretório de download
-download_dir = r'C:\Users\Compras - Similar\Downloads'
+download_dir = os.path.abspath(os.path.join(os.getcwd(), 'downloads'))
+if not os.path.exists(download_dir):
+    os.makedirs(download_dir)
 
 # ChromeOptions configurado
 chrome_options = Options()
@@ -24,6 +26,7 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_argument("--allow-running-insecure-content")
 chrome_options.add_argument("--ignore-certificate-errors")
+chrome_options.add_argument("--unsafely-treat-insecure-origin-as-secure=http://drogcidade.ddns.net:4647")
 prefs = {
     "download.default_directory": download_dir,
     "download.prompt_for_download": False,
@@ -74,7 +77,7 @@ datas_para_processar = [
 df_geral = pd.DataFrame()
 
 for data_str in datas_para_processar:
-    print(f"📅 Processando data: {data_str}")
+    print(f"📅 Processando data: {data_str}", flush=True)
 
     wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_tabView1_4"]/a'))).click()
     campo_ini = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="dat_inicio"]')))
@@ -89,7 +92,7 @@ for data_str in datas_para_processar:
     wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="runReport"]'))).click()
     wait.until(EC.invisibility_of_element((By.XPATH, '//*[@id="divLoading"]')))
 
-    print(f"✅ Relatório do dia {data_str} baixado.")
+    print(f"✅ Relatório do dia {data_str} baixado.", flush=True)
 
     # Verifica e seleciona o arquivo mais recente .xls/.xlsx
     files = sorted(
@@ -98,12 +101,26 @@ for data_str in datas_para_processar:
         reverse=True
     )
 
+    files = sorted(
+        [f for f in os.listdir(download_dir) if f.endswith('.xls') or f.endswith('.xlsx')],
+        key=lambda x: os.path.getmtime(os.path.join(download_dir, x)),
+        reverse=True
+    )
+
     if not files:
-        print(f"⚠️ Nenhum arquivo encontrado para a data {data_str}. Pulando...")
+        print(f"⚠️ Nenhum arquivo encontrado para a data {data_str}. Pulando...", flush=True)
+        continue
+
+    if not files:
+        print(f"⚠️ Nenhum arquivo encontrado para a data {data_str}. Pulando...", flush=True)
         continue
 
     xls_file_path = os.path.join(download_dir, files[0])
-    df = pd.read_excel(xls_file_path, header=14, engine='xlrd')
+    try:
+        df = pd.read_excel(xls_file_path, header=14)
+    except Exception as e:
+        print(f"Erro ao ler Excel: {e}", flush=True)
+        raise
 
     col_lab = df.columns.get_loc('Laboratório')
     col_codigo_prod = df.columns.get_loc('Código')
@@ -160,7 +177,12 @@ for data_str in datas_para_processar:
 navegador.quit()
 
 # Envio ao Google Sheets
-json_credenciais = r'C:\Users\Compras - Similar\Desktop\backup\codigos\codigos\numeros_duplicados\numeros-428820-8bb4f5616c09.json'
+json_credenciais = 'credenciais.json'
+
+# Cria o arquivo a partir da variável de ambiente
+with open(json_credenciais, 'w') as f:
+    f.write(os.environ['CREDS_JSON'])
+
 url_planilha = 'https://docs.google.com/spreadsheets/d/1hXIGivSHQLfTU9UhNsNh4cDdt1tzBZ1ssAjruJbgoRs/edit#gid=0'
 escopo = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credenciais = ServiceAccountCredentials.from_json_keyfile_name(json_credenciais, escopo)
@@ -172,4 +194,4 @@ aba = planilha.sheet1
 aba.batch_clear(['A2:H'])
 aba.update('A2', df_geral.values.tolist())
 
-print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.")
+print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
