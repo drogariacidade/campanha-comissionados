@@ -177,7 +177,7 @@ for data_str in datas_para_processar:
 navegador.quit()
 
 # Envio ao Google Sheets
-json_credenciais = 'credenciais.json'
+json_credenciais = 'numeros-428820-8bb4f5616c09.json'
 url_planilha = 'https://docs.google.com/spreadsheets/d/1hXIGivSHQLfTU9UhNsNh4cDdt1tzBZ1ssAjruJbgoRs/edit#gid=0'
 escopo = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credenciais = ServiceAccountCredentials.from_json_keyfile_name(json_credenciais, escopo)
