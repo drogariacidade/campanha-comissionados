@@ -1,0 +1,26 @@
+name: Executar Script Diariamente
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 5h da manhã no horário de Brasília (UTC-3)
+  workflow_dispatch:     # permite execução manual também
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar o repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependências (se houver)
+        run: |
+          pip install -r requirements.txt || true
+
+      - name: Executar o script
+        run: python produtos-comissionados.py
