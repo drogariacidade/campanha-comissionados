@@ -178,11 +178,6 @@ navegador.quit()
 
 # Envio ao Google Sheets
 json_credenciais = 'credenciais.json'
-
-# Cria o arquivo a partir da variável de ambiente
-with open(json_credenciais, 'w') as f:
-    f.write(os.environ['CREDS_JSON'])
-
 url_planilha = 'https://docs.google.com/spreadsheets/d/1hXIGivSHQLfTU9UhNsNh4cDdt1tzBZ1ssAjruJbgoRs/edit#gid=0'
 escopo = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 credenciais = ServiceAccountCredentials.from_json_keyfile_name(json_credenciais, escopo)
