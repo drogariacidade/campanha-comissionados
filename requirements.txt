@@ -4,3 +4,4 @@ oauth2client
 selenium
 openpyxl
 webdriver-manager
+xlrd>=2.0.1
