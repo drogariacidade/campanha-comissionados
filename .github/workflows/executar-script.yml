@@ -28,5 +28,8 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Criar arquivo de credenciais
+        run: echo "${{ secrets.CREDS_JSON }}" > creds.json
+
       - name: Executar o script
         run: python produtos-comissionados.py
