@@ -29,8 +29,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Criar arquivo de credenciais
+        env:
+          CREDS_JSON: ${{ secrets.CREDS_JSON }}
         run: |
-          printf "%s" "${{ secrets.CREDS_JSON }}" > creds.json
+          echo "$CREDS_JSON" > creds.json
 
       - name: Executar o script
         run: python produtos-comissionados.py
