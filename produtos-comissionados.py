@@ -79,6 +79,10 @@ df_geral = pd.DataFrame()
 for data_str in datas_para_processar:
     print(f"📅 Processando data: {data_str}", flush=True)
 
+    # Limpar pasta de downloads antes de gerar novo relatório
+    for f in os.listdir(download_dir):
+        os.remove(os.path.join(download_dir, f))
+
     wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_tabView1_4"]/a'))).click()
     campo_ini = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="dat_inicio"]')))
     campo_ini.clear()
@@ -91,7 +95,9 @@ for data_str in datas_para_processar:
     wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="saida_4"]'))).click()
     wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="runReport"]'))).click()
     wait.until(EC.invisibility_of_element((By.XPATH, '//*[@id="divLoading"]')))
-
+    
+    time.sleep(2)
+    
     print(f"✅ Relatório do dia {data_str} baixado.", flush=True)
 
     # Verifica e seleciona o arquivo mais recente .xls/.xlsx
@@ -101,20 +107,10 @@ for data_str in datas_para_processar:
         reverse=True
     )
 
-    files = sorted(
-        [f for f in os.listdir(download_dir) if f.endswith('.xls') or f.endswith('.xlsx')],
-        key=lambda x: os.path.getmtime(os.path.join(download_dir, x)),
-        reverse=True
-    )
-
     if not files:
         print(f"⚠️ Nenhum arquivo encontrado para a data {data_str}. Pulando...", flush=True)
         continue
-
-    if not files:
-        print(f"⚠️ Nenhum arquivo encontrado para a data {data_str}. Pulando...", flush=True)
-        continue
-
+        
     xls_file_path = os.path.join(download_dir, files[0])
     try:
         df = pd.read_excel(xls_file_path, header=14)
