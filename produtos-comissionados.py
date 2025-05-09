@@ -71,7 +71,7 @@ for codigo in codigos:
 hoje = datetime.now()
 datas_para_processar = [
     (hoje.replace(day=d)).strftime('%d/%m/%Y')
-    for d in range(1, (hoje - timedelta(days=1)).day + 1)
+    for d in range(1, hoje.day + 1)
 ]
 
 df_geral = pd.DataFrame()
