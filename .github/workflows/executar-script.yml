@@ -32,6 +32,5 @@ jobs:
         run: |
           echo "${{ secrets.CREDS_JSON }}" | jq '.' > creds.json
 
-
       - name: Executar o script
         run: python produtos-comissionados.py
