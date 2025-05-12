@@ -36,7 +36,7 @@ prefs = {
 chrome_options.add_experimental_option("prefs", prefs)
 
 navegador = webdriver.Chrome(options=chrome_options)
-wait = WebDriverWait(navegador, 60)
+wait = WebDriverWait(navegador, 100)
 
 # Acessar sistema
 navegador.get('http://drogcidade.ddns.net:4647/sgfpod1/Login.pod')
