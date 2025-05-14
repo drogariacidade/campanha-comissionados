@@ -3,7 +3,8 @@ name: Executar Script Diariamente
 on:
   schedule:
     - cron: '0 8 * * *'    # 05:00 BR
-    - cron: '0 21 * * *'   # 15:00 BR
+    - cron: '0 15 * * *'   # 12:00 BR
+    - cron: '0 21 * * *'   # 18:00 BR
   workflow_dispatch:
 
 jobs:
