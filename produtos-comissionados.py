@@ -58,7 +58,7 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_ta
 codigos = [
     '76039', '78545', '74944', '72579', '83941', '83797', '48905', '75847', '69568',
     '62173', '62172', '76264', '71808', '18931', '57856', '60401', '59748', '81983',
-    '31391', '26932', '82672', '26898', '26936', '8001'
+    '31391', '26932', '82672', '26898', '26936', '8001', '78657', '57865'
 ]
 campo_codigo = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="cod_reduzidoEntrada"]')))
 for codigo in codigos:
