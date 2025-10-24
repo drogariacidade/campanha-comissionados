@@ -45,7 +45,7 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="nom_senha"]'))).send_
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="login"]'))).click()
 
 # tenta encontrar o elemento
-elementos = driver.find_elements(By.XPATH, '//*[@id="sairModalMsgMovimentos"]')
+elementos = navegador.find_elements(By.XPATH, '//*[@id="sairModalMsgMovimentos"]')
 
 # se existir pelo menos um, clica; caso contrário, segue o fluxo
 if elementos:
@@ -203,6 +203,7 @@ aba.batch_clear(['A2:H'])
 aba.update('A2', df_geral.values.tolist())
 
 print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
+
 
 
 
