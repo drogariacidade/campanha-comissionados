@@ -47,6 +47,7 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="login"]'))).click()
 # BOTAO SNGPC
 time.sleep(2.5)
 navegador.find_element(By.TAG_NAME, "body").send_keys(Keys.F11)
+time.sleep(2.5)
 print('Pop-up SNGPC fechado com sucesso.', flush=True)
 
 # Caminho até o relatório
@@ -195,6 +196,7 @@ aba.batch_clear(['A2:H'])
 aba.update('A2', df_geral.values.tolist())
 
 print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
+
 
 
 
