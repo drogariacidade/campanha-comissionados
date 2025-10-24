@@ -44,6 +44,19 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="id_cod_usuario"]'))).
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="nom_senha"]'))).send_keys('9939')
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="login"]'))).click()
 
+# tenta encontrar o elemento
+elementos = driver.find_elements(By.XPATH, '//*[@id="sairModalMsgMovimentos"]')
+
+# se existir pelo menos um, clica; caso contrário, segue o fluxo
+if elementos:
+    try:
+        elementos[0].click()
+        print("✅ Elemento 'sairModalMsgMovimentos' encontrado e clicado.")
+    except Exception as e:
+        print(f"⚠️ Erro ao clicar no elemento: {e}")
+else:
+    print("➡️ Elemento 'sairModalMsgMovimentos' não encontrado. Seguindo o fluxo...")
+
 # Caminho até o relatório
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menuBar"]/li[11]/a/span[2]'))).click()
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="ul123"]/li[3]/a/span'))).click()
@@ -190,6 +203,7 @@ aba.batch_clear(['A2:H'])
 aba.update('A2', df_geral.values.tolist())
 
 print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
+
 
 
 
