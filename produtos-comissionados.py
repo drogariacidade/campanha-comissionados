@@ -207,3 +207,4 @@ print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=
 
 
 
+
