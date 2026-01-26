@@ -78,7 +78,8 @@ codigos = [
     78270, 78271, 42727, 72579, 56381, 79553, 81830, 26898, 65886, 79648,
     72220, 48905, 69609, 76280, 76279, 84921, 83895, 85012, 76276, 76038,
     76277, 85011, 65888, 67981, 80703, 70729, 70112, 81903, 81904, 81989,
-    81990, 81905, 78883, 81902, 83797, 62542, 70113
+    81990, 81905, 78883, 81902, 83797, 62542, 70113, 55660, 85326, 57047,
+    37394
 ]
 
 campo_codigo = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="cod_reduzidoEntrada"]')))
@@ -207,6 +208,7 @@ aba.batch_clear(['A2:H'])
 aba.update('A2', df_geral.values.tolist())
 
 print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
+
 
 
 
