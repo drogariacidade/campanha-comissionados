@@ -61,7 +61,7 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="sel_relatorio_8"]')))
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_tabView1_3"]/a'))).click()
 
 # Inserir códigos uma única vez
-codigo = [
+codigos = [
     82976, 76264, 75718, 75738, 83446, 2558, 2559, 71808, 84356, 60944,
     55660, 84029, 85326, 67967, 57057, 84336, 8001, 71807, 81362, 84920,
     74943, 74944, 76039, 78545, 84896, 9189, 9190, 9192, 9197, 9258,
