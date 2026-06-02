@@ -52,6 +52,19 @@ def get_codes_from_gsheet(cliente, spreadsheet_id, worksheet_name, column_name='
         return codigos
     return []
 
+# === INITIALIZE GOOGLE SHEETS CLIENT FIRST ===
+json_credenciais = 'creds.json'
+escopo = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+credenciais = ServiceAccountCredentials.from_json_keyfile_name(json_credenciais, escopo)
+cliente = gspread.authorize(credenciais)
+
+# === GET CODES FROM GOOGLE SHEET ===
+spreadsheet_id = "14zK_cZOpVkDc2zzlsR1L3tFIfwwUpZ6QXbAKFjGwxAE"
+worksheet_name = "Página1"
+codigos = get_codes_from_gsheet(cliente, spreadsheet_id, worksheet_name, "Cód.", header_row=1)
+print(f"Códigos carregados: {codigos}")
+print(f"Total de códigos: {len(codigos)}")
+
 # ChromeOptions configurado
 chrome_options = Options()
 chrome_options.add_argument("--headless")
@@ -95,34 +108,7 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_ta
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="sel_relatorio_8"]'))).click()
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_tabView1_3"]/a'))).click()
 
-# Inserir códigos uma única vez
-'''codigos = [
-    82976, 76264, 75718, 75738, 83446, 2558, 2559, 71808, 84356, 60944,
-    55660, 84029, 85326, 67967, 57057, 84336, 8001, 71807, 81362, 84920,
-    74943, 74944, 76039, 78545, 84896, 9189, 9190, 9192, 9197, 9258,
-    69857, 85461, 75336, 69476, 85834, 85833, 64912, 77137, 69612, 83985,
-    85662, 85661, 85058, 86114, 85767, 60573, 32103, 7988, 82672, 78657,
-    85427, 18931, 18932, 71260, 71524, 64191, 60909, 24472, 79288, 79641,
-    84954, 26932, 26936, 60401, 69858, 79638, 79637, 85399, 85400, 85401,
-    64976, 64868, 64977, 65222, 61350, 59748, 51031, 54386, 81983, 69299,
-    84176, 81980, 81981, 85658, 85657, 85659, 69300, 81283, 84284, 31391,
-    83753, 83749, 83754, 83751, 83752, 83750, 77195, 80772, 72763, 72604,
-    76219, 69574, 69339, 65731, 64238, 57856, 69173, 85831, 85832, 85835,
-    85836, 85837, 85839, 85838, 85840, 85842, 85843, 85841, 65215, 85532,
-    58052, 82601, 75847, 75884, 69861, 69860, 84917, 83941, 85897, 85660,
-    77602, 74286, 84489, 37394, 69568, 80211, 85898, 79646, 65561, 69614,
-    83620, 85680, 85681, 85682, 40989, 78270, 78271, 42727, 72579, 56381,
-    79553, 81830, 65886, 79648, 72220, 48905, 69609, 76280, 76279, 84921,
-    83895, 85012, 76276, 76038, 76277, 85011, 65888, 67981, 86206, 86207,
-    86145, 86181, 80703, 86182, 70729, 70112, 84273, 84140, 84141, 81903,
-    81904, 81989, 81990, 81905, 78883, 81902, 83797, 62542, 70113
-]'''
-
-spreadsheet_id = "14zK_cZOpVkDc2zzlsR1L3tFIfwwUpZ6QXbAKFjGwxAE"
-worksheet_name = "Página1"
-codigos = get_codes_from_gsheet(cliente, spreadsheet_id, worksheet_name, "Cód.", header_row=1)
-print(f"Códigos carregados: {codigos}")
-
+# Inserir códigos (agora usando os carregados da planilha)
 campo_codigo = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="cod_reduzidoEntrada"]')))
 for codigo in codigos:
     campo_codigo.clear()
@@ -144,7 +130,12 @@ for data_str in datas_para_processar:
 
     # Limpar pasta de downloads antes de gerar novo relatório
     for f in os.listdir(download_dir):
-        os.remove(os.path.join(download_dir, f))
+        file_path = os.path.join(download_dir, f)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Erro ao remover {file_path}: {e}")
 
     wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_tabView1_4"]/a'))).click()
     campo_ini = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="dat_inicio"]')))
@@ -175,11 +166,6 @@ for data_str in datas_para_processar:
         continue
         
     xls_file_path = os.path.join(download_dir, files[0])
-    '''try:
-        df = pd.read_excel(xls_file_path, header=14)
-    except Exception as e:
-        print(f"Erro ao ler Excel: {e}", flush=True)
-        raise'''
 
     try:
         # Try openpyxl first (most common for .xlsx)
@@ -247,17 +233,21 @@ for data_str in datas_para_processar:
 # Encerra o navegador
 navegador.quit()
 
-# Envio ao Google Sheets
-json_credenciais = 'creds.json'
-url_planilha = 'https://docs.google.com/spreadsheets/d/1hXIGivSHQLfTU9UhNsNh4cDdt1tzBZ1ssAjruJbgoRs/edit#gid=0'
-escopo = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-credenciais = ServiceAccountCredentials.from_json_keyfile_name(json_credenciais, escopo)
-cliente = gspread.authorize(credenciais)
-planilha = cliente.open_by_url(url_planilha)
-aba = planilha.sheet1
+# === SEND RESULTS TO GOOGLE SHEETS (using same cliente) ===
+# Note: Your cliente is already authenticated from earlier
+try:
+    url_planilha = 'https://docs.google.com/spreadsheets/d/1hXIGivSHQLfTU9UhNsNh4cDdt1tzBZ1ssAjruJbgoRs/edit#gid=0'
+    planilha = cliente.open_by_url(url_planilha)
+    aba = planilha.sheet1
 
-# Limpa apenas o intervalo necessário e insere os dados na ordem certa
-aba.batch_clear(['A2:H'])
-aba.update('A2', df_geral.values.tolist())
+    # Limpa apenas o intervalo necessário e insere os dados na ordem certa
+    aba.batch_clear(['A2:H'])
+    if not df_geral.empty:
+        aba.update('A2', df_geral.values.tolist())
+        print(f"📤 {len(df_geral)} linhas enviadas com sucesso ao Google Sheets.", flush=True)
+    else:
+        print("⚠️ Nenhum dado para enviar ao Google Sheets.", flush=True)
+except Exception as e:
+    print(f"Erro ao enviar dados para o Google Sheets: {e}", flush=True)
 
-print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
+print("✅ Processamento concluído!", flush=True)
