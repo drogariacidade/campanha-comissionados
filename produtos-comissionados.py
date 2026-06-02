@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import os
 import gspread
+from google.oauth2.service_account import Credentials
 from oauth2client.service_account import ServiceAccountCredentials
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,6 +17,40 @@ import time
 download_dir = os.path.abspath(os.path.join(os.getcwd(), 'downloads'))
 if not os.path.exists(download_dir):
     os.makedirs(download_dir)
+
+def get_codes_from_gsheet(cliente, spreadsheet_id, worksheet_name, column_name='Cód.', header_row=1):
+    """
+    Read codes from Google Sheets using existing authenticated client
+    header_row: 0-based index of the row to use as column headers (default 1 = row 2)
+    """
+    # Open spreadsheet
+    spreadsheet = cliente.open_by_key(spreadsheet_id)
+    
+    # Get worksheet by name
+    worksheet = spreadsheet.worksheet(worksheet_name)
+    
+    # Get all data
+    data = worksheet.get_all_values()
+    
+    if data and len(data) > header_row:
+        # Use specified row as header, data starts after that
+        df = pd.DataFrame(data[header_row+1:], columns=data[header_row])
+        
+        # Extract codes from specified column
+        if column_name in df.columns:
+            codigos = df[column_name].dropna().astype(int).tolist()
+        else:
+            # Try case-insensitive match
+            for col in df.columns:
+                if col.lower() == column_name.lower():
+                    codigos = df[col].dropna().astype(int).tolist()
+                    break
+            else:
+                # If column not found, use first column
+                codigos = df.iloc[:, 0].dropna().astype(int).tolist()
+        
+        return codigos
+    return []
 
 # ChromeOptions configurado
 chrome_options = Options()
@@ -61,7 +96,7 @@ wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="sel_relatorio_8"]')))
 wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tabTabdhtmlgoodies_tabView1_3"]/a'))).click()
 
 # Inserir códigos uma única vez
-codigos = [
+'''codigos = [
     82976, 76264, 75718, 75738, 83446, 2558, 2559, 71808, 84356, 60944,
     55660, 84029, 85326, 67967, 57057, 84336, 8001, 71807, 81362, 84920,
     74943, 74944, 76039, 78545, 84896, 9189, 9190, 9192, 9197, 9258,
@@ -81,7 +116,12 @@ codigos = [
     83895, 85012, 76276, 76038, 76277, 85011, 65888, 67981, 86206, 86207,
     86145, 86181, 80703, 86182, 70729, 70112, 84273, 84140, 84141, 81903,
     81904, 81989, 81990, 81905, 78883, 81902, 83797, 62542, 70113
-]
+]'''
+
+spreadsheet_id = "14zK_cZOpVkDc2zzlsR1L3tFIfwwUpZ6QXbAKFjGwxAE"
+worksheet_name = "Página1"
+codigos = get_codes_from_gsheet(cliente, spreadsheet_id, worksheet_name, "Cód.", header_row=1)
+print(f"Códigos carregados: {codigos}")
 
 campo_codigo = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="cod_reduzidoEntrada"]')))
 for codigo in codigos:
@@ -221,19 +261,3 @@ aba.batch_clear(['A2:H'])
 aba.update('A2', df_geral.values.tolist())
 
 print("📤 Todos os dados foram enviados com sucesso ao Google Sheets.", flush=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
