@@ -135,11 +135,23 @@ for data_str in datas_para_processar:
         continue
         
     xls_file_path = os.path.join(download_dir, files[0])
-    try:
+    '''try:
         df = pd.read_excel(xls_file_path, header=14)
     except Exception as e:
         print(f"Erro ao ler Excel: {e}", flush=True)
-        raise
+        raise'''
+
+    try:
+        # Try openpyxl first (most common for .xlsx)
+        df = pd.read_excel(xls_file_path, header=14, engine='openpyxl')
+    except Exception as e1:
+        try:
+            # Try xlrd for older .xls files
+            df = pd.read_excel(xls_file_path, header=14, engine='xlrd')
+        except Exception as e2:
+            print(f"Failed with openpyxl: {e1}")
+            print(f"Failed with xlrd: {e2}")
+            raise ValueError(f"Cannot read Excel file: {xls_file_path}")
 
     col_lab = df.columns.get_loc('Laboratório')
     col_codigo_prod = df.columns.get_loc('Código')
